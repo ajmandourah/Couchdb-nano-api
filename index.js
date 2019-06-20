@@ -1,5 +1,5 @@
 const express = require('express');
-const nano = require("nano")('localhost:5984');
+const nano = require("nano")('http://192.168.0.124:5984');
 const app = express();
 
 app.use(express.json());
@@ -10,15 +10,23 @@ app.set('json spaces', 2);
 const db = nano.use('notification');
 
 //the main insert function. this is just a test!!
-let InsertData = (body) => {
+let InsertData = (body, title) => {
     if (body == "") {
         console.log('You cannot submit an empty body');
     } else {
         //define the object then define the inner value as the function varable
-        let data = { body: body };
+        var date = new Date();
+        date = JSON.stringify(date)
+        let data = {
+            body: body,
+            title: title,
+            created_at: date
+        };
         data.body = body
+        data.title = title
+        data.created_at = date
         // use the body value as an id in the database
-        db.insert(data, data.body);
+        db.insert(data);
         console.log('inserted');
     }
 }
@@ -39,9 +47,18 @@ let InsertData = (body) => {
 //     })
 //}
 
+let getLastInserted = async () => {
+    let body = await db.list({ include_docs: true });
+    var result = body.rows.map((doc) => {
+        return doc.doc;
+    });
+    result = result.reverse();
+    console.log(result[0]);
+    return result[0];
 
+};
 
-
+getLastInserted()
 // This here worked perfectly using the map() function . it output the json file correctly
 app.get('/', async (req, res) => {
     let body = await db.list({ include_docs: true });
@@ -49,8 +66,9 @@ app.get('/', async (req, res) => {
     var result = body.rows.map((doc) => {
         return doc.doc;
     })
-    res.send(result);
+    //making it in revers order.
+    res.send(result.reverse());
 });
 
 
-app.listen(3000, () => console.log('Running..'))
+app.listen(3000, () => console.log('Running the server on port 3000'))
