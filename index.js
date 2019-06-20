@@ -1,8 +1,10 @@
 const express = require('express');
 const nano = require("nano")('http://192.168.0.124:5984');
+const bodyParser = require("body-parser")
 const app = express();
 
 app.use(express.json());
+app.use(bodyParser.urlencoded({ extended: true }))
 //set the spacing to prettify the json output when using res.json()
 app.set('json spaces', 2);
 
@@ -69,6 +71,27 @@ app.get('/', async (req, res) => {
     //making it in revers order.
     res.send(result.reverse());
 });
+
+app.post('/', async (req, res) => {
+    if (req.title == '' && req.body == '') {
+        console.log("cannot send empty field")
+    } else {
+        var date = new Date();
+        date = JSON.stringify(date)
+        const body = req.body.body;
+        const title = req.body.title;
+        let data = {
+            'body': body,
+            'title': title,
+            'created_at': date
+        };
+        // use the body value as an id in the database
+        await db.insert(data);
+        console.log('Data insertedd!');
+        res.send("Data inserted succesfully")
+
+    }
+})
 
 
 app.listen(3000, () => console.log('Running the server on port 3000'))
