@@ -58,7 +58,7 @@ let getLastInserted = async () => {
 
 };
 
-getLastInserted()
+
 // This here worked perfectly using the map() function . it output the json file correctly
 app.get('/', async (req, res) => {
     let body = await db.list({ include_docs: true });
