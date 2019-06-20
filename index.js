@@ -1,10 +1,9 @@
 const express = require('express');
 const nano = require("nano")('http://192.168.0.124:5984');
-const bodyParser = require("body-parser")
 const app = express();
 
 app.use(express.json());
-app.use(bodyParser.urlencoded({ extended: true }))
+app.use(express.urlencoded({ extended: true }))
 //set the spacing to prettify the json output when using res.json()
 app.set('json spaces', 2);
 
