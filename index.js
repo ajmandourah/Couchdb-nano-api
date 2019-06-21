@@ -53,7 +53,9 @@ let getLastInserted = async () => {
     var result = body.rows.map((doc) => {
         return doc.doc;
     });
+    //reversing the array to get the last created first
     result = result.reverse();
+    //showing the first one ( the last created )
     console.log(result[0]);
     return result[0];
 
@@ -68,6 +70,7 @@ app.get('/', async (req, res) => {
         return doc.doc;
     })
     //making it in revers order.
+    result = result.sort((a, b) => { return b - a })
     res.send(result.reverse());
 });
 
@@ -76,7 +79,6 @@ app.post('/', async (req, res) => {
         console.log("cannot send empty field")
     } else {
         var date = new Date();
-        date = JSON.stringify(date)
         const body = req.body.body;
         const title = req.body.title;
         let data = {
