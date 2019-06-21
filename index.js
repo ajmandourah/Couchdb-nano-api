@@ -11,6 +11,8 @@ app.use(express.urlencoded({ extended: true }))
 app.set('json spaces', 2);
 app.use(express.static('public'));
 
+
+
 // defining the main database variable.
 const db = nano.use('notification');
 
