@@ -1,11 +1,15 @@
 const express = require('express');
 const nano = require("nano")('http://192.168.0.124:5984');
 const app = express();
+const cors = require('cors');
 
+//CORS must be enabled to accept fetch commands from outside. dunno what is it really
+app.use(cors())
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }))
 //set the spacing to prettify the json output when using res.json()
 app.set('json spaces', 2);
+app.use(express.static('public'));
 
 // defining the main database variable.
 const db = nano.use('notification');
@@ -60,10 +64,12 @@ let getLastInserted = async () => {
     return result[0];
 
 };
-
+app.get('/', (req, res) => {
+    res.sendFile(__dirname + '/public/form.html')
+})
 
 // This here worked perfectly using the map() function . it output the json file correctly
-app.get('/', async (req, res) => {
+app.get('/json', async (req, res) => {
     let body = await db.list({ include_docs: true });
     // console.log(body.rows)
     var result = body.rows.map((doc) => {
