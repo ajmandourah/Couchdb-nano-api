@@ -2,6 +2,8 @@ const express = require('express');
 const nano = require("nano")('http://192.168.0.124:5984');
 const app = express();
 const cors = require('cors');
+var fs = require('fs')
+var https = require('https')
 
 //CORS must be enabled to accept fetch commands from outside. dunno what is it really
 app.use(cors())
@@ -9,7 +11,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }))
 //set the spacing to prettify the json output when using res.json()
 app.set('json spaces', 2);
-app.use(express.static('public'));
+app.use(express.static(__dirname + '/public'));
 
 
 
@@ -72,17 +74,17 @@ app.get('/', (req, res) => {
 
 // This here worked perfectly using the map() function . it output the json file correctly
 app.get('/json', async (req, res) => {
-    let body = await db.list({ include_docs: true });
+    let body = await db.view('notification', 'date', { include_docs: true });
     // console.log(body.rows)
     var result = body.rows.map((doc) => {
         return doc.doc;
     })
     //making it in revers order.
-    result = result.sort((a, b) => { return b - a })
+    // result = result.sort((a, b) => { return b - a })
     res.send(result.reverse());
 });
 
-app.post('/', async (req, res) => {
+app.post('/json', async (req, res) => {
     if (req.title == '' && req.body == '') {
         console.log("cannot send empty field")
     } else {
@@ -102,5 +104,9 @@ app.post('/', async (req, res) => {
     }
 })
 
+https.createServer({
+    key: fs.readFileSync('server.key'),
+    cert: fs.readFileSync('server.cert')
+}, app)
 
-app.listen(3000, () => console.log('Running the server on port 3000'))
+app.listen(3001, () => console.log('Running the server on port 3000'))
